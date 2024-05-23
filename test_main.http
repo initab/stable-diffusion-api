@@ -1,0 +1,13 @@
+# Test your FastAPI endpoints
+
+POST http://127.0.0.1:8082/api/generate_image
+Accept: image/jpeg
+Content-Type: application/json
+
+{
+  "prompt": "A background for a PowerPoint presentation about being the Purple team in cyber warfare exercise. Main colors should be red, blue, and purple",
+  "inference_steps": 50,
+  "guidance_scale": 12.7
+}
+
+###
