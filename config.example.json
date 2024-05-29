@@ -1,6 +1,6 @@
 {
-  "root": "",
-  "endpoint": "",
-  "model": "",
-  "variant": ""
+  "root": "/api",
+  "endpoint": "/generate",
+  "model": "stabilityai/stable-diffusion-2",
+  "variant": "fp16"
 }

@@ -1,6 +1,6 @@
-import argparse
 import io
 import json
+import os
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -8,28 +8,11 @@ from diffusers import AutoPipelineForText2Image
 from fastapi.responses import StreamingResponse, JSONResponse
 import torch
 
-parser = argparse.ArgumentParser(
-    description='API frontend for Stable Diffusion Models to take in parameters and return generated Image over HTTP',
-    epilog='At the moment this API does not support any form of authentication nor encryption. '
-           'DO NOT USE IN PRODUCTION')
-parser.add_argument("-c", "--config", help="Path to config file", default="config.json", required=False)
-parser.add_argument("-r", "--root", help="Root path of API", default="/api", required=False)
-parser.add_argument("-e", "--endpoint", help="Endpoint name for generating image",
-                    default="/generate_image", required=False)
-parser.add_argument("-m", "--model", help="Which Diffusion Model to use",
-                    default="segmind/SSD-1B", required=False,)
-parser.add_argument("--variant", help="Which Variant model to use", default="fp16", required=False,)
 
-args = parser.parse_args()
-
-with open(args.config, 'r') as f:
+# This code expects the config file to point out all settings needed to run
+config_path = os.getenv("SD_API_CONFIG_PATH", "config.json")
+with open(config_path, 'r') as f:
     config = json.load(f)
-
-# This parts makes sure that there is always a value in the config, and that arguments to the command line
-# supersedes config values
-for key, value in vars(args):
-    if key not in config or not config[key] or parser.get_default(key) != value:
-        config[key] = value
 
 
 # API Start
@@ -96,6 +79,7 @@ def generate_image(item: Item):
                      height=1024
                      ).images[0]
 
+    # Make a quick smoke test to see that we have data to send back
     jpeg_image = io.BytesIO()
     image.save(jpeg_image, format="JPEG")
     jpeg_image.seek(0)
